@@ -17,3 +17,11 @@ def get_async_db_url():
         os.getenv('DB_HOST', 'localhost:5557'),
         os.getenv('DB_NAME', 'db'),
     )
+
+
+def get_redis_url():
+    return 'redis://%s:%s/%s' % (
+        os.getenv('REDIS_HOST', 'localhost'),
+        os.getenv('REDIS_PORT', '6379'),
+        os.getenv('REDIS_DB', '1')
+    )

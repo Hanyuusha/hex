@@ -10,3 +10,7 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
     ports:
       - "5557:5432"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"

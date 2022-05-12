@@ -1,0 +1,10 @@
+.gitignore
+docker-compose.infra.yaml
+docker-compose.app.yaml
+Dockerfile
+Makefile
+pytest.ini
+README.md
+setup.cfg
+data
+.pytest_cache

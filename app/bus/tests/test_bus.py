@@ -1,11 +1,11 @@
 import uuid
 
 import pytest
-
 from app.bus.bus import MessageBus
-from app.bus.messages import (CreateUserMessage, DeleteUserMessage,
-                              GetUserMessage)
-from app.db.adapter import TestDatabaseAdapter
+from app.bus.messages import (
+    CreateUserMessage, DeleteUserMessage, GetUserMessage,
+)
+from app.store.adapter import TestDatabaseAdapter
 
 
 @pytest.fixture

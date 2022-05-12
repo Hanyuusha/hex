@@ -1,7 +1,6 @@
-from flask import Blueprint, abort, current_app, make_response, request
-
 from app.bus.bus import ValidateException
 from app.bus.messages import CreateUserMessage, GetUserMessage
+from flask import Blueprint, abort, current_app, make_response, request
 
 api = Blueprint('api', __name__)
 

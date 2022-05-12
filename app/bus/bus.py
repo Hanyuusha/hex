@@ -1,9 +1,11 @@
 from abc import ABCMeta, abstractmethod
 
-from app.db.adapter import DataBaseAdapter
+from app.store.adapter import DataBaseAdapter
 
-from .messages import (CreateUserMessage, CreateUserResultMessage,
-                       DeleteUserMessage, GetUserMessage, GetUserResultMessage)
+from .messages import (
+    CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
+    GetUserMessage, GetUserResultMessage,
+)
 
 
 class ValidateException(Exception):
@@ -44,4 +46,8 @@ class MessageBus(IMessageBus):
                 return await self.adapter.delete_user(message.id)
             case GetUserMessage():
                 user = await self.adapter.get_user(message.id)
+
+                if user is None:
+                    raise ValidateException({'message': 'user not found'})
+
                 return GetUserResultMessage(id=user.id, first_name=user.first_name, second_name=user.second_name)

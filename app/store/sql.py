@@ -1,11 +1,10 @@
 import uuid
 
+from app.config import get_async_db_url
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-
-from app.config import get_async_db_url
 
 from .adapter import DataBaseAdapter, ModelUser
 
@@ -33,9 +32,13 @@ class SQLAlchemyAdapter(DataBaseAdapter):
     def async_session(self):
         return sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)()
 
-    async def get_user(self, uid: UUID) -> ModelUser:
+    async def get_user(self, uid: UUID) -> ModelUser | None:
         async with self.async_session() as session:
             user = await session.get(User, uid)
+
+            if user is None:
+                return None
+
             return ModelUser(
                 id=user.id,
                 first_name=user.first_name,

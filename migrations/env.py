@@ -2,9 +2,8 @@ import os
 from logging.config import fileConfig
 
 from alembic import context
+from app.config import get_sync_db_url
 from sqlalchemy import create_engine
-
-from app.config import get_db_url
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -40,7 +39,7 @@ def run_migrations_offline():
     """
 
     context.configure(
-        url=get_db_url(),
+        url=get_sync_db_url(),
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -57,7 +56,7 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = create_engine(get_db_url())
+    connectable = create_engine(get_sync_db_url())
 
     with connectable.connect() as connection:
         context.configure(

@@ -9,6 +9,9 @@ class ModelUser:
     second_name: str
     id: UUID | None = None
 
+    def to_json(self) -> dict:
+        return {'id': str(self.id), 'first_name': self.first_name, 'second_name': self.second_name}
+
 
 class DataBaseAdapter(metaclass=ABCMeta):
 

@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from uuid import UUID
 
-from app.db.adapter import ModelUser
+from app.store.adapter import ModelUser
 
 
 class BaseResponse(metaclass=ABCMeta):
