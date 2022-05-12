@@ -1,5 +1,7 @@
 import uuid
+
 import pytest
+
 from app.db.adapter import ModelUser
 from app.db.sql import SQLAlchemyAdapter
 

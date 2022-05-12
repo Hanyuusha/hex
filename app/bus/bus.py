@@ -1,7 +1,16 @@
 from abc import ABCMeta, abstractmethod
 
-from .messages import CreateUserMessage, DeleteUserMessage, GetUserMessage, CreateUserResultMessage, GetUserResultMessage
 from app.db.adapter import DataBaseAdapter
+
+from .messages import (CreateUserMessage, CreateUserResultMessage,
+                       DeleteUserMessage, GetUserMessage, GetUserResultMessage)
+
+
+class ValidateException(Exception):
+    errors: dict
+
+    def __init__(self, errors):
+        self.errors = errors
 
 
 class IMessageBus(metaclass=ABCMeta):
@@ -21,6 +30,12 @@ class MessageBus(IMessageBus):
 
     async def handle(self, message: CreateUserMessage | DeleteUserMessage | GetUserMessage) \
             -> CreateUserResultMessage | GetUserResultMessage | None:
+
+        errors = message.validate()
+
+        if errors is not None:
+            raise ValidateException(errors)
+
         match message:
             case CreateUserMessage():
                 uid = await self.adapter.create_user(message.to_user())

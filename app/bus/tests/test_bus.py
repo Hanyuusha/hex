@@ -1,10 +1,11 @@
 import uuid
 
 import pytest
-from app.db.adapter import TestDatabaseAdapter
 
 from app.bus.bus import MessageBus
-from app.bus.messages import CreateUserMessage, DeleteUserMessage, GetUserMessage
+from app.bus.messages import (CreateUserMessage, DeleteUserMessage,
+                              GetUserMessage)
+from app.db.adapter import TestDatabaseAdapter
 
 
 @pytest.fixture
@@ -37,4 +38,3 @@ async def test_handle_delete_user(message_bus):
     result = await message_bus.handle(msg)
 
     assert result is None
-
