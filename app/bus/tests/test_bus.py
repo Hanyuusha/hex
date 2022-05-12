@@ -1,0 +1,39 @@
+import uuid
+
+import pytest
+from app.db.adapter import TestDatabaseAdapter
+
+from app.bus.bus import MessageBus
+from app.bus.messages import CreateUserMessage, DeleteUserMessage, GetUserMessage
+
+
+@pytest.fixture
+def message_bus():
+    return MessageBus(adapter=TestDatabaseAdapter())
+
+
+def test_handle_create_user(message_bus):
+    msg = CreateUserMessage(first_name='Zero', second_name='Two')
+    result = message_bus.handle(msg)
+
+    assert isinstance(result.id, uuid.UUID)
+    assert result.first_name == 'Zero'
+    assert result.second_name == 'Two'
+
+
+def test_handle_get_user(message_bus):
+    uid = uuid.uuid4()
+    msg = GetUserMessage(id=uid)
+    result = message_bus.handle(msg)
+
+    assert result.id == uid
+    assert result.first_name == 'Zero'
+    assert result.second_name == 'Second'
+
+
+def test_handle_delete_user(message_bus):
+    msg = DeleteUserMessage(id=uuid.uuid4())
+    result = message_bus.handle(msg)
+
+    assert result is None
+

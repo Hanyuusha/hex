@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from uuid import UUID
+from uuid import UUID, uuid4
 
 
 @dataclass
@@ -23,3 +23,15 @@ class DataBaseAdapter(metaclass=ABCMeta):
     @abstractmethod
     def delete_user(self, uid: UUID) -> None:
         pass
+
+
+class TestDatabaseAdapter(DataBaseAdapter):
+
+    def create_user(self, user: ModelUser) -> UUID:
+        return uuid4()
+
+    def delete_user(self, uid: UUID) -> None:
+        return None
+
+    def get_user(self, uid: UUID) -> ModelUser:
+        return ModelUser(id=uid, first_name='Zero', second_name='Second')
