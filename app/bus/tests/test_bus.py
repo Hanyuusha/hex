@@ -37,4 +37,4 @@ async def test_handle_delete_user(message_bus):
     msg = DeleteUserMessage(id=uuid.uuid4())
     result = await message_bus.handle(msg)
 
-    assert result is None
+    assert result.exists is True

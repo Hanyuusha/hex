@@ -25,15 +25,14 @@ class User(Base):
 class SQLAlchemyAdapter(DataBaseAdapter):
 
     engine = None
+    Session = None
 
     def __init__(self):
         self.engine = create_async_engine(get_async_db_url(), echo=True, future=True)
-
-    def async_session(self):
-        return sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)()
+        self.Session = sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)
 
     async def get_user(self, uid: UUID) -> ModelUser | None:
-        async with self.async_session() as session:
+        async with self.Session() as session:
             user = await session.get(User, uid)
 
             if user is None:
@@ -46,7 +45,7 @@ class SQLAlchemyAdapter(DataBaseAdapter):
             )
 
     async def create_user(self, user: ModelUser) -> UUID:
-        async with self.async_session() as session:
+        async with self.Session() as session:
             orm_user = User(
                 id=uuid.uuid4(),
                 first_name=user.first_name,
@@ -57,8 +56,13 @@ class SQLAlchemyAdapter(DataBaseAdapter):
 
             return orm_user.id
 
-    async def delete_user(self, uid: UUID) -> None:
-        async with self.async_session() as session:
+    async def delete_user(self, uid: UUID) -> bool:
+        async with self.Session() as session:
             user = await session.get(User, uid)
+
+            if user is None:
+                return False
+
             await session.delete(user)
             await session.commit()
+            return True

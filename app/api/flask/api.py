@@ -1,4 +1,4 @@
-from app.bus import CreateUserMessage, GetUserMessage, ValidateException
+from app.bus import CreateUserMessage, GetUserMessage, DeleteUserMessage, InternalException
 from flask import Blueprint, abort, current_app, make_response, request
 
 api = Blueprint('api', __name__)
@@ -15,7 +15,7 @@ async def create_user():
                 second_name=payload.get('second_name')
             )
         )
-    except ValidateException as e:
+    except InternalException as e:
         abort(make_response(e.errors), 400)
 
     return result.to_json()
@@ -29,7 +29,21 @@ async def get_user(uid):
                 id=uid
             )
         )
-    except ValidateException as e:
+    except InternalException as e:
+        abort(make_response(e.errors), 400)
+
+    return result.to_json()
+
+
+@api.route('/user/<uuid:uid>', methods=['DELETE'])
+async def delete_user(uid):
+    try:
+        result = await current_app.bus.handle(
+            DeleteUserMessage(
+                id=uid
+            )
+        )
+    except InternalException as e:
         abort(make_response(e.errors), 400)
 
     return result.to_json()

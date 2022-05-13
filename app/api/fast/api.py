@@ -1,12 +1,23 @@
 import uuid
 
 from app.bus import (
-    CreateUserMessage, GetUserMessage, IMessageBus, get_message_bus, ValidateException,
+    CreateUserMessage, GetUserMessage, DeleteUserMessage, IMessageBus, get_message_bus, InternalException,
 )
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Request, APIRouter
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 app = FastAPI()
+
+rout = APIRouter(prefix='/api/v1')
+
+
+@app.exception_handler(InternalException)
+async def internal_exception_handler(_: Request, exc: InternalException):
+    return JSONResponse(
+        status_code=exc.status,
+        content=exc.errors,
+    )
 
 
 class CreateUser(BaseModel):
@@ -14,7 +25,7 @@ class CreateUser(BaseModel):
     second_name: str
 
 
-@app.post("/api/v1/user")
+@rout.post('/user')
 async def create_user(user: CreateUser, bus: IMessageBus = Depends(get_message_bus)):
     result = await bus.handle(
         CreateUserMessage(
@@ -25,15 +36,23 @@ async def create_user(user: CreateUser, bus: IMessageBus = Depends(get_message_b
     return result.to_json()
 
 
-@app.get("/api/v1/user/{uid}")
+@rout.get('/user/{uid}')
 async def get_user(uid: uuid.UUID, bus: IMessageBus = Depends(get_message_bus)):
-    result = None
-    try:
-        result = await bus.handle(
-            GetUserMessage(
-                id=uid
-            )
+    result = await bus.handle(
+        GetUserMessage(
+            id=uid
         )
-    except ValidateException as e:
-        raise HTTPException(status_code=404, detail=e.errors)
+    )
     return result.to_json()
+
+
+@rout.delete('/user/{uid}')
+async def del_user(uid: uuid.UUID, bus: IMessageBus = Depends(get_message_bus)):
+    result = await bus.handle(
+        DeleteUserMessage(
+            id=uid
+        )
+    )
+    return result.to_json()
+
+app.include_router(rout)

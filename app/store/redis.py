@@ -16,8 +16,12 @@ class RedisAdapter(DataBaseAdapter):
         pool = aioredis.ConnectionPool.from_url(url=get_redis_url(), max_connections=10)
         self.redis = aioredis.Redis(connection_pool=pool)
 
-    async def get_user(self, uid: UUID) -> ModelUser:
+    async def get_user(self, uid: UUID) -> ModelUser | None:
         payload = await self.redis.get(str(uid))
+
+        if payload is None:
+            return None
+
         payload = json.loads(payload)
         return ModelUser(
             id=UUID(payload.get('id')),
@@ -32,5 +36,9 @@ class RedisAdapter(DataBaseAdapter):
         await self.redis.set(str(uid), json.dumps(user.to_json()))
         return uid
 
-    async def delete_user(self, uid: UUID) -> None:
+    async def delete_user(self, uid: UUID) -> bool:
+        if not await self.redis.exists(str(uid)):
+            return False
+
         await self.redis.delete(str(uid))
+        return True

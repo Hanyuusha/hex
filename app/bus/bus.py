@@ -4,22 +4,24 @@ from app.store.adapter import DataBaseAdapter
 
 from .messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
-    GetUserMessage, GetUserResultMessage,
+    GetUserMessage, GetUserResultMessage, DeleteUserResultMessage,
 )
 
 
-class ValidateException(Exception):
+class InternalException(Exception):
     errors: dict
+    status: int
 
-    def __init__(self, errors):
+    def __init__(self, errors, status=400):
         self.errors = errors
+        self.status = status
 
 
 class IMessageBus(metaclass=ABCMeta):
 
     @abstractmethod
     async def handle(self, message: CreateUserMessage | DeleteUserMessage | GetUserMessage) \
-            -> CreateUserResultMessage | GetUserResultMessage | None:
+            -> CreateUserResultMessage | GetUserResultMessage | DeleteUserResultMessage:
         pass
 
 
@@ -30,24 +32,34 @@ class MessageBus(IMessageBus):
     def __init__(self, adapter: DataBaseAdapter):
         self.adapter = adapter
 
-    async def handle(self, message: CreateUserMessage | DeleteUserMessage | GetUserMessage) \
-            -> CreateUserResultMessage | GetUserResultMessage | None:
+    async def handle(self, msg: CreateUserMessage | DeleteUserMessage | GetUserMessage) \
+            -> CreateUserResultMessage | GetUserResultMessage | DeleteUserResultMessage:
 
-        errors = message.validate()
+        errors = msg.validate()
 
         if errors is not None:
-            raise ValidateException(errors)
+            raise InternalException(errors)
 
-        match message:
+        match msg:
             case CreateUserMessage():
-                uid = await self.adapter.create_user(message.to_user())
-                return CreateUserResultMessage(id=uid)
+                return await self.create_user(msg)
             case DeleteUserMessage():
-                return await self.adapter.delete_user(message.id)
+                return await self.delete_user(msg)
             case GetUserMessage():
-                user = await self.adapter.get_user(message.id)
+                return await self.get_user(msg)
 
-                if user is None:
-                    raise ValidateException({'message': 'user not found'})
+    async def create_user(self, msg: CreateUserMessage) -> CreateUserResultMessage:
+        uid = await self.adapter.create_user(msg.to_user())
+        return CreateUserResultMessage(id=uid)
 
-                return GetUserResultMessage(id=user.id, first_name=user.first_name, second_name=user.second_name)
+    async def delete_user(self, msg):
+        exists = await self.adapter.delete_user(msg.id)
+        return DeleteUserResultMessage(exists=exists)
+
+    async def get_user(self, msg: GetUserMessage) -> GetUserResultMessage:
+        user = await self.adapter.get_user(msg.id)
+
+        if user is None:
+            raise InternalException({'message': 'user not found'}, status=404)
+
+        return GetUserResultMessage(id=user.id, first_name=user.first_name, second_name=user.second_name)

@@ -68,3 +68,11 @@ class DeleteUserMessage(BaseRequest):
     def validate(self) -> None | dict:
         if self.id is None:
             return {'message': '"id" not defined'}
+
+
+@dataclass
+class DeleteUserResultMessage(BaseResponse):
+    exists: bool
+
+    def to_json(self) -> dict:
+        return {'exists': self.exists}

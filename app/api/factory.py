@@ -19,7 +19,8 @@ def create_asgi_flask_app():
 
 
 def app():
-    match os.getenv('API_TYPE', 'fast'):
+    api_type = os.getenv('API_TYPE', 'fast')
+    match api_type:
         case 'flask':
             return create_asgi_flask_app()
         case 'fast':
