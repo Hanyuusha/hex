@@ -1,10 +1,11 @@
 import os
 
+from .adapter import DataBaseAdapter
 from .redis import RedisAdapter
 from .sql import SQLAlchemyAdapter
 
 
-def get_store():
+def get_store() -> DataBaseAdapter:
     store = os.getenv('STORE_MODE', 'redis')
     match store:
         case 'redis':
