@@ -1,12 +1,13 @@
+from asgiref.wsgi import WsgiToAsgi
+from fastapi import status
+from flask import Flask, request
+from flask.views import MethodView
+
 from app.bus import IMessageBus, get_message_bus
 from app.domain import InternalException
 from app.messages import (
     CreateUserMessage, DeleteUserMessage, GetUserMessage, ValidateException,
 )
-from asgiref.wsgi import WsgiToAsgi
-from fastapi import status
-from flask import Flask, request
-from flask.views import MethodView
 
 app = Flask(__name__)
 

@@ -1,4 +1,4 @@
-name: Running Code Coverage Tests
+name: Running Code Coverage Tests and lints
 
 on: [push, pull_request]
 
@@ -48,6 +48,8 @@ jobs:
 
     - name: Install dependencies
       run: make ideps
+    - name: Lint
+      run: make lint
 
     - name: Run migrations
       run: alembic upgrade head

@@ -1,12 +1,13 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 
+from fastapi import status
+
 from app.messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
     DeleteUserResultMessage, GetUserMessage, GetUserResultMessage,
 )
 from app.store.adapter import DataBaseAdapter
-from fastapi import status
 
 
 @dataclass

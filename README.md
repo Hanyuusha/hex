@@ -1,3 +1,6 @@
+[![codecov](https://codecov.io/gh/Hanyuusha/hex/branch/master/graph/badge.svg?token=U6DSSZ29RW)](https://codecov.io/gh/Hanyuusha/hex)
+
+
 #### HEX
 Попытка накидать [Hexagonal architecture](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software))
 

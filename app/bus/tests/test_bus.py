@@ -2,6 +2,7 @@ import uuid
 from unittest.mock import patch
 
 import pytest
+
 from app.bus import MessageBus
 from app.messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,

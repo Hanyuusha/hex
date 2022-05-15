@@ -2,6 +2,7 @@ import json
 import uuid
 
 import pytest
+
 from app.store.adapter import ModelUser
 from app.store.redis import RedisAdapter
 

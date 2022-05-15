@@ -3,6 +3,7 @@ import uuid
 from uuid import UUID
 
 import aioredis
+
 from app.config import get_redis_url
 
 from .adapter import DataBaseAdapter, ModelUser

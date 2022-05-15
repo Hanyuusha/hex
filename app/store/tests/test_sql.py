@@ -1,6 +1,7 @@
 import uuid
 
 import pytest
+
 from app.store.adapter import ModelUser
 from app.store.sql import SQLAlchemyAdapter, User
 

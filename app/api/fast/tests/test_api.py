@@ -3,8 +3,9 @@ from unittest.mock import patch
 
 import pytest
 from fastapi import status
+from fastapi.testclient import TestClient
 
-from app.api.flask.api import app
+from app.api.fast.api import app
 from app.domain import InternalException
 from app.messages import (
     CreateUserResultMessage, DeleteUserResultMessage, GetUserResultMessage,
@@ -14,7 +15,7 @@ from app.messages import (
 
 @pytest.fixture
 def client():
-    return app.test_client()
+    return TestClient(app)
 
 
 @patch('app.bus.bus.MessageBus.handle')
@@ -27,7 +28,7 @@ def test_get_user_ok(mock_handle, client):
 
     assert response.status_code == status.HTTP_200_OK
 
-    json_response = response.json
+    json_response = response.json()
 
     assert json_response['id'] == str(uid)
     assert json_response['first_name'] == first_name
@@ -50,7 +51,7 @@ def test_user_create_ok(mock_handle, client):
     response = client.post('/api/v1/user', json={'first_name': 'Zero', 'second_name': 'Two'})
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json['id'] == str(uid)
+    assert response.json()['id'] == str(uid)
 
 
 @patch('app.bus.bus.MessageBus.handle')
@@ -58,7 +59,7 @@ def test_user_create_failed(mock_handle, client):
     mock_handle.side_effect = ValidateException(errors={}, )
     response = client.post('/api/v1/user', json={})
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @patch('app.bus.bus.MessageBus.handle')
@@ -67,4 +68,4 @@ def test_user_delete_ok(mock_handle, client):
     response = client.delete(f'/api/v1/user/{uuid.uuid4()}')
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.json['exists'] is True
+    assert response.json()['exists'] is True

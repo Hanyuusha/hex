@@ -2,6 +2,7 @@ import uuid
 from unittest.mock import patch
 
 import pytest
+
 from app.domain.users import UserApp
 from app.messages import CreateUserMessage, DeleteUserMessage, GetUserMessage
 from app.store.adapter import ModelUser

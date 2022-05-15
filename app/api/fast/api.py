@@ -1,13 +1,14 @@
 import uuid
 
+from fastapi import APIRouter, Depends, FastAPI, Request, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
 from app.bus import IMessageBus, get_message_bus
 from app.domain import InternalException
 from app.messages import (
     CreateUserMessage, DeleteUserMessage, GetUserMessage, ValidateException,
 )
-from fastapi import APIRouter, Depends, FastAPI, Request, status
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 
 app = FastAPI()
 
