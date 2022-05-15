@@ -37,7 +37,13 @@ jobs:
     - name: Run tests
       run: make test-cov
       env:
+        DB_USER: postgres
+        DB_PASSWORD: password
+        DB_HOST: postgres
+        DB_PORT: 5432
         REDIS_HOST: redis
+        STORE_TYPE: redis
+        API_TYPE: fast
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
