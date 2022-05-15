@@ -6,6 +6,7 @@ from app.messages import (
     DeleteUserResultMessage, GetUserMessage, GetUserResultMessage,
 )
 from app.store.adapter import DataBaseAdapter
+from fastapi import status
 
 
 @dataclass
@@ -48,6 +49,6 @@ class UserApp(IUsersApp):
         user = await self.adapter.get_user(msg.id)
 
         if user is None:
-            raise InternalException({'message': 'user not found'}, status=404)
+            raise InternalException({'message': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
 
         return GetUserResultMessage(id=user.id, first_name=user.first_name, second_name=user.second_name)

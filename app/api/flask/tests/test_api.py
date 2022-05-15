@@ -1,0 +1,69 @@
+import uuid
+from unittest.mock import patch
+
+import pytest
+from app.api.flask.api import app
+from app.domain import InternalException
+from app.messages import (
+    CreateUserResultMessage, DeleteUserResultMessage, GetUserResultMessage,
+    ValidateException,
+)
+from fastapi import status
+
+
+@pytest.fixture
+def client():
+    return app.test_client()
+
+
+@patch('app.bus.bus.MessageBus.handle')
+def test_get_user_ok(mock_handle, client):
+    uid = uuid.uuid4()
+    first_name = 'Zero'
+    second_name = 'Two'
+    mock_handle.return_value = GetUserResultMessage(id=uid, first_name=first_name, second_name=second_name)
+    response = client.get(f'/api/v1/user/{uid}')
+
+    assert response.status_code == status.HTTP_200_OK
+
+    json_response = response.json
+
+    assert json_response['id'] == str(uid)
+    assert json_response['first_name'] == first_name
+    assert json_response['second_name'] == second_name
+
+
+@patch('app.bus.bus.MessageBus.handle')
+def test_get_user_not_found(mock_handle, client):
+    uid = uuid.uuid4()
+    mock_handle.side_effect = InternalException({'message': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
+    response = client.get(f'/api/v1/user/{uid}')
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@patch('app.bus.bus.MessageBus.handle')
+def test_user_create_ok(mock_handle, client):
+    uid = uuid.uuid4()
+    mock_handle.return_value = CreateUserResultMessage(id=uid)
+    response = client.post('/api/v1/user', json={'first_name': 'Zero', 'second_name': 'Two'})
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json['id'] == str(uid)
+
+
+@patch('app.bus.bus.MessageBus.handle')
+def test_user_create_failed(mock_handle, client):
+    mock_handle.side_effect = ValidateException(errors={}, )
+    response = client.post('/api/v1/user', json={})
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@patch('app.bus.bus.MessageBus.handle')
+def test_user_delete_ok(mock_handle, client):
+    mock_handle.return_value = DeleteUserResultMessage(exists=True)
+    response = client.delete(f'/api/v1/user/{uuid.uuid4()}')
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json['exists'] is True

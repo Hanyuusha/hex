@@ -1,16 +1,10 @@
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass
 
 from app.domain.users import IUsersApp
 from app.messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
     DeleteUserResultMessage, GetUserMessage, GetUserResultMessage,
 )
-
-
-@dataclass
-class ValidateException(Exception):
-    errors: dict
 
 
 class IMessageBus(metaclass=ABCMeta):
@@ -31,10 +25,7 @@ class MessageBus(IMessageBus):
     async def handle(self, msg: CreateUserMessage | DeleteUserMessage | GetUserMessage) \
             -> CreateUserResultMessage | GetUserResultMessage | DeleteUserResultMessage:
 
-        errors = msg.validate()
-
-        if errors is not None:
-            raise ValidateException(errors)
+        self.validate(msg)
 
         match msg:
             case CreateUserMessage():
@@ -43,3 +34,9 @@ class MessageBus(IMessageBus):
                 return await self.app.delete_user(msg)
             case GetUserMessage():
                 return await self.app.get_user(msg)
+
+    def validate(self, msg):
+        exc = msg.validate()
+
+        if exc is not None:
+            raise exc

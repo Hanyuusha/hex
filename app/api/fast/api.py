@@ -1,9 +1,11 @@
 import uuid
 
-from app.bus import IMessageBus, ValidateException, get_message_bus
+from app.bus import IMessageBus, get_message_bus
 from app.domain import InternalException
-from app.messages import CreateUserMessage, DeleteUserMessage, GetUserMessage
-from fastapi import APIRouter, Depends, FastAPI, Request
+from app.messages import (
+    CreateUserMessage, DeleteUserMessage, GetUserMessage, ValidateException,
+)
+from fastapi import APIRouter, Depends, FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -29,7 +31,7 @@ async def internal_exception_handler(_: Request, exc: InternalException):
 @app.exception_handler(ValidateException)
 async def validation_exception_handler(_: Request, exc: ValidateException):
     return JSONResponse(
-        status_code=400,
+        status_code=status.HTTP_400_BAD_REQUEST,
         content=exc.errors,
     )
 

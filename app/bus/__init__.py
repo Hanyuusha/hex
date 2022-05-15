@@ -1,6 +1,6 @@
 from app.domain import get_domain_app
 
-from .bus import IMessageBus, MessageBus, ValidateException  # noqa: F401
+from .bus import IMessageBus, MessageBus  # noqa: F401
 
 
 def get_message_bus() -> IMessageBus:

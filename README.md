@@ -6,15 +6,17 @@
 2. Docker, docker-compose
 
 ### Быстрый запуск
-Запускает инфру и билдит приложение
+Запускает инфраструктуру и собирает приложение
 
 `make app`
 
 ### Подготовка к запуску
-1. `pip install -r requirements.txt`
-2. `make infra`
-3. Выставить необходимые переменные окружения через `export ENV_NAME=value`
-4. Запуск миграций `alembic upgrade head`
+1. Установка poetry: `pip install poetry`
+2. Создание виртуального окружения: `poetry config virtualenvs.create false --local`
+3. Установка зависимостей: `poetry install`
+4. Поднятие локальной инфраструктуры: `make infra`
+5. Выставить необходимые переменные окружения через: `export ENV_NAME=value`
+6. Запуск миграций: `alembic upgrade head`
 
 ### WEB API
 `make web`

@@ -6,7 +6,7 @@ from .sql import SQLAlchemyAdapter
 
 
 def get_store() -> DataBaseAdapter:
-    store = os.getenv('STORE_MODE', 'redis')
+    store = os.getenv('STORE_TYPE', 'redis')
     match store:
         case 'redis':
             return RedisAdapter()

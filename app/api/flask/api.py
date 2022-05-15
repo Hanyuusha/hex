@@ -1,51 +1,66 @@
-from app.bus import ValidateException
+from app.bus import IMessageBus, get_message_bus
 from app.domain import InternalException
-from app.messages import CreateUserMessage, DeleteUserMessage, GetUserMessage
-from flask import Blueprint, abort, current_app, make_response, request
+from app.messages import (
+    CreateUserMessage, DeleteUserMessage, GetUserMessage, ValidateException,
+)
+from asgiref.wsgi import WsgiToAsgi
+from fastapi import status
+from flask import Flask, request
+from flask.views import MethodView
 
-api = Blueprint('api', __name__)
+app = Flask(__name__)
 
 
-@api.route('/user', methods=['POST'])
-async def create_user():
-    payload = request.json
+class UserAPI(MethodView):
 
-    try:
-        result = await current_app.bus.handle(
+    message_bus: IMessageBus = None
+
+    def __init__(self):
+        self.message_bus = get_message_bus()
+
+    async def get(self, uid):
+        result = await self.message_bus.handle(
+            GetUserMessage(
+                id=uid
+            )
+        )
+
+        return result.to_json()
+
+    async def post(self):
+        payload = request.json
+
+        result = await self.message_bus.handle(
             CreateUserMessage(
                 first_name=payload.get('first_name'),
                 second_name=payload.get('second_name')
             )
         )
-    except (InternalException, ValidateException) as e:
-        abort(make_response(e.errors), 400)
 
-    return result.to_json()
+        return result.to_json()
 
-
-@api.route('/user/<uuid:uid>', methods=['GET'])
-async def get_user(uid):
-    try:
-        result = await current_app.bus.handle(
-            GetUserMessage(
-                id=uid
-            )
-        )
-    except InternalException as e:
-        abort(make_response(e.errors), 400)
-
-    return result.to_json()
-
-
-@api.route('/user/<uuid:uid>', methods=['DELETE'])
-async def delete_user(uid):
-    try:
-        result = await current_app.bus.handle(
+    async def delete(self, uid):
+        result = await self.message_bus.handle(
             DeleteUserMessage(
                 id=uid
             )
         )
-    except (InternalException, ValidateException) as e:
-        abort(make_response(e.errors), 400)
 
-    return result.to_json()
+        return result.to_json()
+
+
+@app.errorhandler(InternalException)
+def internal_exception_handler(exc: InternalException):
+    return exc.errors, exc.status
+
+
+@app.errorhandler(ValidateException)
+def validate_exception_handler(exc: ValidateException):
+    return exc.errors, status.HTTP_400_BAD_REQUEST
+
+
+user_view = UserAPI.as_view('user_api')
+app.add_url_rule('/api/v1/user/<uuid:uid>', view_func=user_view, methods=['GET', 'DELETE'])
+app.add_url_rule('/api/v1/user', view_func=user_view, methods=['POST'])
+
+asgi_app = WsgiToAsgi(app)
