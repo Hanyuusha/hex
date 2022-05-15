@@ -1,4 +1,4 @@
-name: Running Code Coverage
+name: Running Code Coverage Tests
 
 on: [push, pull_request]
 
@@ -48,6 +48,14 @@ jobs:
 
     - name: Install dependencies
       run: make ideps
+
+    - name: Run migrations
+      run: alembic upgrade head
+      env:
+        DB_USER: postgres
+        DB_PASSWORD: password
+        DB_HOST: localhost
+        DB_PORT: 5432
 
     - name: Run tests
       run: make test-cov
