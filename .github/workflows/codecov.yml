@@ -6,6 +6,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    container: python:3.10
 
     services:
       redis:
@@ -53,9 +54,9 @@ jobs:
       env:
         DB_USER: postgres
         DB_PASSWORD: password
-        DB_HOST: postgres
+        DB_HOST: localhost
         DB_PORT: 5432
-        REDIS_HOST: redis
+        REDIS_HOST: localhost
         STORE_TYPE: redis
         API_TYPE: fast
 
