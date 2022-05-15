@@ -1,26 +1,14 @@
 import argparse
 import asyncio
+import os
 from argparse import RawTextHelpFormatter
 
-from app.bus.bus import MessageBus
-from app.bus.messages import GetUserMessage
-from app.store.redis import RedisAdapter
-from app.store.sql import SQLAlchemyAdapter
+from app.bus import GetUserMessage, MessageBus
+from app.domain import get_domain_app
 
 
-def get_store(store):
-    match store:
-        case 'sql':
-            return SQLAlchemyAdapter()
-        case 'redis':
-            return RedisAdapter()
-        case _:
-            print('you mast define "--store" option "sql" or "redis"')
-            exit()
-
-
-async def print_cli(bus, uid):
-    result = await bus.handle(GetUserMessage(id=uid))
+async def print_cli(message_bus, uid):
+    result = await message_bus.handle(GetUserMessage(id=uid))
     print(f'\n{result.to_json()}')
 
 
@@ -30,5 +18,6 @@ if __name__ == '__main__':
     parser.add_argument('--store', help='datastore sql or redis')
     args = parser.parse_args()
 
-    bus = MessageBus(get_store(args.store))
+    os.environ['STORE_TYPE'] = args.store
+    bus = MessageBus(get_domain_app())
     asyncio.run(print_cli(bus, args.uid))

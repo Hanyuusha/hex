@@ -21,7 +21,7 @@ services:
       DB_HOST: postgres
       DB_PORT: 5432
       REDIS_HOST: redis
-      STORE_MODE: sql
+      STORE_TYPE: redis
       API_TYPE: fast
     ports:
       - "5000:5000"

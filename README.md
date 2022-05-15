@@ -1,8 +1,6 @@
 #### HEX
 Попытка накидать [Hexagonal architecture](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software))
 
-Для простого CRUD она к сожелени избыточна, поэтому куда воткнуть `domain layer` я не нашёл, но в остальном постарался соблюсти концепцию.
-
 ### Requirements
 1. Python >= 3.10
 2. Docker, docker-compose
@@ -45,7 +43,7 @@
 | REDIS_HOST  | Redis host                             | -        | localhost      |
 | REDIS_PORT  | Redis port                             | -        | 6379           |
 | REDIS_DB    | Redis DB                               | -        | 1              |
-| STORE_MODE  | Store "redis" or "sql"                 | -        | redis          |
+| STORE_TYPE  | Store "redis" or "sql"                 | -        | redis          |
 | API_TYPE    | Тип используемого API "fast", "flask"  | -        | fast           |
 
 
