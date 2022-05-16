@@ -17,10 +17,9 @@ app:
 	docker-compose -f local/docker-compose.app.yaml up --remove-orphans
 
 web:
-	hypercorn "app.api.factory:app()" -b 127.0.0.1:5000 --reload
+	poetry run python -m app web
 
-ideps:
+install-deps:
 	pip3 install --upgrade pip
 	pip3 install poetry
-	poetry config virtualenvs.create false --local
 	poetry install
