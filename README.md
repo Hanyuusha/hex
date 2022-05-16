@@ -18,7 +18,7 @@
 2. Установка зависимостей: `poetry install`
 3. Поднятие локальной инфраструктуры: `make infra`
 4. Выставить необходимые переменные окружения через: `export ENV_NAME=value`
-5. Запуск миграций: `alembic upgrade head`
+5. Запуск миграций: `poetry run alembic upgrade head`
 
 ### WEB API
 `make web`
