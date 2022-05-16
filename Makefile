@@ -1,13 +1,13 @@
 .PHONY: lint test infra app ideps
 
 lint:
-	flake8 app/
+	poetry run flake8 app/
 
 test:
-	pytest app/
+	poetry run pytest app/
 
 test-cov:
-	pytest app/ --cov=app --cov-report=xml
+	poetry run pytest app/ --cov=app --cov-report=xml
 
 infra:
 	docker-compose -f local/docker-compose.infra.yaml up --remove-orphans
