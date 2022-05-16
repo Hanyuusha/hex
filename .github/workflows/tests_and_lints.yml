@@ -1,6 +1,6 @@
 name: Running Code Coverage Tests and lints
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
@@ -48,7 +48,8 @@ jobs:
 
     - name: Install dependencies
       run: make ideps
-    - name: Lint
+
+    - name: Run lint
       run: make lint
 
     - name: Run migrations
