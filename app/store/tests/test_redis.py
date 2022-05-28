@@ -20,7 +20,6 @@ async def uid(adapter):
     return uid
 
 
-# Вообще стоило было сделать три разных теста.
 @pytest.mark.asyncio
 async def test_create_user(adapter):
     result = await adapter.create_user(ModelUser(first_name='Zero', second_name='Two'))

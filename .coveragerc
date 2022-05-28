@@ -1,0 +1,3 @@
+[run]
+omit = app/app.py
+       app/__main__.py

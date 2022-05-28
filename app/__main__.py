@@ -7,7 +7,7 @@ from app.bus import MessageBus
 from app.domain import get_domain_app
 from app.messages import GetUserMessage
 
-from .run_app import run_app
+from .app import run_app
 
 
 async def print_cli(message_bus, uid):

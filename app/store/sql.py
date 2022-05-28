@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-from app.config import get_async_db_url
+from app.config.store import get_async_db_url
 
 from .adapter import DataBaseAdapter, ModelUser
 
