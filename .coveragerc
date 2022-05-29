@@ -3,3 +3,6 @@ branch = True
 
 omit = app/app.py
        app/__main__.py
+
+[report]
+skip_empty = True
