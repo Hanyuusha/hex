@@ -1,3 +1,9 @@
 [run]
+branch = True
+
 omit = app/app.py
        app/__main__.py
+       app/*/tests/*
+
+[report]
+skip_empty = True

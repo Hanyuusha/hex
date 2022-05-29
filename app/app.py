@@ -17,11 +17,9 @@ from app.config.types import api_type
 
 def run_migrations() -> None:
     path = Path(os.path.realpath(__file__))
-    migrations_path = os.path.join(path.parent.parent, 'migrations')
     ini_path = os.path.join(path.parent.parent, 'alembic.ini')
 
     alembic_cfg = AlembicConfig(ini_path)
-    alembic_cfg.set_main_option('script_location', migrations_path)
     alembic_cfg.set_main_option('sqlalchemy.url', get_sync_db_url())
 
     command.upgrade(alembic_cfg, 'head')
