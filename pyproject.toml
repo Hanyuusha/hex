@@ -16,6 +16,7 @@ aioredis = "^2.0.1"
 asgiref = "^3.5.1"
 alembic = "^1.7.7"
 asyncpg = "^0.25.0"
+cli-ui = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

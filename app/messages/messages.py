@@ -9,6 +9,9 @@ from app.store.adapter import ModelUser
 class ValidateException(Exception):
     errors: dict
 
+    def __str__(self):
+        return self.errors['message']
+
 
 class BaseResponse(metaclass=ABCMeta):
 
@@ -46,6 +49,9 @@ class CreateUserResultMessage(BaseResponse):
     def to_json(self) -> dict:
         return {'id': self.id}
 
+    def __str__(self):
+        return str(self.id)
+
 
 @dataclass
 class GetUserMessage(BaseRequest):
@@ -65,6 +71,9 @@ class GetUserResultMessage(BaseResponse):
     def to_json(self):
         return {'id': self.id, 'first_name': self.first_name, 'second_name': self.second_name}
 
+    def __str__(self):
+        return f'ID: {self.id}, First name: {self.first_name}, Second name: {self.second_name}'
+
 
 @dataclass
 class DeleteUserMessage(BaseRequest):
@@ -81,3 +90,8 @@ class DeleteUserResultMessage(BaseResponse):
 
     def to_json(self) -> dict:
         return {'exists': self.exists}
+
+    def __str__(self):
+        if self.exists:
+            return 'deleted'
+        return 'not found'

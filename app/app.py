@@ -12,7 +12,7 @@ from hypercorn.config import Config as HypercornConfig
 from app.api import fast_api, flask_api
 from app.config.app import BIND_ADDRESS, BIND_PORT
 from app.config.store import DB_HOST, DB_PORT, get_sync_db_url
-from app.config.types import api_type
+from app.config.types import ApiType, api_type
 
 
 def run_migrations() -> None:
@@ -27,10 +27,13 @@ def run_migrations() -> None:
 
 def get_app():
     match api_type:
-        case 'flask':
+        case ApiType.FLASK:
             return flask_api
-        case 'fast':
+        case ApiType.FAST:
             return fast_api
+        case _:
+            print(f'Unknown API_TYPE {api_type} use "flask" or "fast"')
+            exit()
 
 
 def wait_for_postgres():

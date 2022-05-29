@@ -29,7 +29,7 @@ class SQLAlchemyAdapter(DataBaseAdapter):
     Session = None
 
     def __init__(self):
-        self.engine = create_async_engine(get_async_db_url(), echo=True, future=True)
+        self.engine = create_async_engine(get_async_db_url(), echo=False, future=True)
         self.Session = sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)
 
     async def get_user(self, uid: UUID) -> ModelUser | None:

@@ -1,4 +1,4 @@
-.PHONY: lint test infra app ideps
+.PHONY: lint test infra app install-deps web cli
 
 lint:
 	poetry run flake8 app/
@@ -18,6 +18,9 @@ app:
 
 web:
 	poetry run python -m app web
+
+cli:
+	poetry run python -m app cli
 
 install-deps:
 	pip3 install --upgrade pip

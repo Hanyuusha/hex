@@ -9,7 +9,7 @@
 2. Docker, docker-compose
 
 ### Быстрый запуск
-Запускает инфраструктуру и собирает приложение
+Запускает инфраструктуру, собирает приложение, поднимает WEB API [compose file](/local/docker-compose.app.yaml).
 
 `make app`
 
@@ -23,8 +23,8 @@
 ### WEB API
 `make web`
 
-### CLI
-`poetry run python -m app cli --store=<STORE TYPE> --uid=<USER ID>`
+### Интерактивный шелл
+`make cli`
 
 ### Запуск тестов
 `make test`
