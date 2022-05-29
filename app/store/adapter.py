@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from uuid import UUID, uuid4
+from uuid import UUID
 
 
 @dataclass
@@ -26,15 +26,3 @@ class DataBaseAdapter(metaclass=ABCMeta):
     @abstractmethod
     async def delete_user(self, uid: UUID) -> bool:
         pass
-
-
-class TestDatabaseAdapter(DataBaseAdapter):
-
-    async def create_user(self, user: ModelUser) -> UUID:
-        return uuid4()
-
-    async def delete_user(self, uid: UUID) -> bool:
-        return True
-
-    async def get_user(self, uid: UUID) -> ModelUser:
-        return ModelUser(id=uid, first_name='Zero', second_name='Second')

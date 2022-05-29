@@ -69,3 +69,12 @@ def test_user_delete_ok(mock_handle, client):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()['exists'] is True
+
+
+@patch('app.bus.bus.MessageBus.handle')
+def test_exception_handler(mock_handle, client):
+    mock_handle.side_effect = ValidateException(errors={'test': 'test'})
+    response = client.delete(f'/api/v1/user/{uuid.uuid4()}')
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()['test'] == 'test'
