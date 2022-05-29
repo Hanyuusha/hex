@@ -3,7 +3,7 @@ branch = True
 
 omit =
         app/app.py
-        app/__mainj__.py
+        app/__main__.py
         app/config/*
         app/cli/*
 

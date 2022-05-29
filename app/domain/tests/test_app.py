@@ -54,7 +54,7 @@ async def test_handle_get_user_not_found(mock_get_user, mock_database_adapter):
     msg = GetUserMessage(id=uuid.uuid4())
     with pytest.raises(InternalException) as exc:
         await user_app.get_user(msg)
-    exc.value.status == 404
+    assert exc.value.status == 404
 
 
 @pytest.mark.asyncio

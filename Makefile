@@ -1,4 +1,4 @@
-.PHONY: lint test infra app install-deps web cli
+.PHONY: lint test test-cov infra app install-deps web cli
 
 lint:
 	poetry run flake8 app/

@@ -8,7 +8,6 @@
 '''
 
 import uuid
-from abc import ABCMeta, abstractmethod
 from enum import Enum
 
 import cli_ui
@@ -20,29 +19,10 @@ from app.messages import (
 
 
 class Command(Enum):
-    ADD = 'add'
-    SHOW = 'show'
-    DELETE = 'delete'
-    EXIT = 'exit'
-
-
-class ICli(metaclass=ABCMeta):
-
-    @abstractmethod
-    async def ask_user(self):
-        pass
-
-    @abstractmethod
-    async def add_user(self):
-        pass
-
-    @abstractmethod
-    async def show_user(self):
-        pass
-
-    @abstractmethod
-    async def delete_user(self):
-        pass
+    ADD = 'ADD'
+    SHOW = 'SHOW'
+    DELETE = 'DELETE'
+    EXIT = 'EXIT'
 
 
 def excetpion_handler(func):
@@ -57,7 +37,7 @@ def excetpion_handler(func):
     return wrapper
 
 
-class Cli(ICli):
+class Cli:
 
     COMMANDS = [
         Command.ADD.name,
@@ -72,14 +52,8 @@ class Cli(ICli):
         self.bus = bus
 
     async def ask_user(self):
-        await self.match_command(
-            Command(
-                cli_ui.ask_choice(
-                    'Enter command:',
-                    choices=self.COMMANDS,
-                )
-            )
-        )
+        command = cli_ui.ask_choice('Enter command:', choices=self.COMMANDS)
+        await self.match_command(Command(command))
 
     async def match_command(self, command: Command):
         match command:
@@ -89,8 +63,6 @@ class Cli(ICli):
                 await self.show_user()
             case Command.DELETE:
                 await self.delete_user()
-            case _:
-                exit()
 
     @excetpion_handler
     async def add_user(self):
