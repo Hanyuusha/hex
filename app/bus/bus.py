@@ -25,7 +25,7 @@ class MessageBus(IMessageBus):
     async def handle(self, msg: CreateUserMessage | DeleteUserMessage | GetUserMessage) \
             -> CreateUserResultMessage | GetUserResultMessage | DeleteUserResultMessage:
 
-        self.validate(msg)
+        msg.validate()
 
         match msg:
             case CreateUserMessage():
@@ -34,9 +34,3 @@ class MessageBus(IMessageBus):
                 return await self.app.delete_user(msg)
             case GetUserMessage():
                 return await self.app.get_user(msg)
-
-    def validate(self, msg):
-        exc = msg.validate()
-
-        if exc is not None:
-            raise exc

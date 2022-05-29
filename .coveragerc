@@ -3,6 +3,7 @@ branch = True
 
 omit =
         app/app.py
+        app/__mainj__.py
         app/config/*
         app/cli/*
 
@@ -13,4 +14,4 @@ exclude_lines =
                 @abstractmethod
                 case _:
                 def __str__
-                if __name__ == .__main__.:
+                def __repr__

@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from app.domain.users import UserApp
+from app.domain.users import InternalException, UserApp
 from app.messages import CreateUserMessage, DeleteUserMessage, GetUserMessage
 from app.store.adapter import ModelUser
 
@@ -41,6 +41,20 @@ async def test_handle_get_user(mock_get_user, mock_database_adapter):
     assert result.id == uid
     assert result.first_name == 'Zero'
     assert result.second_name == 'Two'
+
+
+@pytest.mark.asyncio
+@patch('app.store.adapter.DataBaseAdapter')
+@patch('app.store.adapter.DataBaseAdapter.get_user')
+async def test_handle_get_user_not_found(mock_get_user, mock_database_adapter):
+    mock_get_user.return_value = None
+    mock_database_adapter.return_value.get_user = mock_get_user
+
+    user_app = UserApp(adapter=mock_database_adapter())
+    msg = GetUserMessage(id=uuid.uuid4())
+    with pytest.raises(InternalException) as exc:
+        await user_app.get_user(msg)
+    exc.value.status == 404
 
 
 @pytest.mark.asyncio

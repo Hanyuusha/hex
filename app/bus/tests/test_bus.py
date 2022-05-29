@@ -7,7 +7,6 @@ from app.bus import MessageBus
 from app.messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
     DeleteUserResultMessage, GetUserMessage, GetUserResultMessage,
-    ValidateException,
 )
 
 
@@ -60,21 +59,3 @@ async def test_handle_delete_user(mock_delete_user, mock_user_app):
     result = await message_bus.handle(msg)
 
     assert result.exists is True
-
-
-@patch('app.domain.users.UserApp')
-@patch('app.domain.users.UserApp.delete_user')
-@pytest.mark.asyncio
-async def test_handle_rise_exception(mock_delete_user, mock_user_app):
-    uid = uuid.uuid4()
-    mock_delete_user.side_effect = ValidateException(errors={'test': 'test'})
-    mock_user_app.return_value.delete_user = mock_delete_user
-
-    message_bus = MessageBus(mock_user_app())
-    msg = DeleteUserMessage(uid)
-
-    try:
-        await message_bus.handle(msg)
-    except ValidateException as exc:
-        assert isinstance(exc, ValidateException)
-        assert exc.errors['test'] == 'test'

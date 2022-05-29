@@ -23,7 +23,7 @@ class BaseResponse(metaclass=ABCMeta):
 class BaseRequest(metaclass=ABCMeta):
 
     @abstractmethod
-    def validate(self) -> None | ValidateException:
+    def validate(self):
         pass
 
 
@@ -35,11 +35,11 @@ class CreateUserMessage(BaseRequest):
     def to_user(self) -> ModelUser:
         return ModelUser(first_name=self.first_name, second_name=self.second_name)
 
-    def validate(self) -> None | ValidateException:
+    def validate(self):
         if self.first_name is None:
-            return ValidateException(errors={'message': '"first_name" not defined'})
+            raise ValidateException(errors={'message': '"first_name" not defined'})
         if self.second_name is None:
-            return ValidateException(errors={'message': '"second_name" not defined'})
+            raise ValidateException(errors={'message': '"second_name" not defined'})
 
 
 @dataclass
@@ -57,9 +57,9 @@ class CreateUserResultMessage(BaseResponse):
 class GetUserMessage(BaseRequest):
     id: UUID
 
-    def validate(self) -> None | ValidateException:
+    def validate(self):
         if self.id is None:
-            return ValidateException(errors={'message': '"id" not defined'})
+            raise ValidateException(errors={'message': '"id" not defined'})
 
 
 @dataclass
@@ -79,9 +79,9 @@ class GetUserResultMessage(BaseResponse):
 class DeleteUserMessage(BaseRequest):
     id: UUID
 
-    def validate(self) -> None | ValidateException:
+    def validate(self):
         if self.id is None:
-            return ValidateException(errors={'message': '"id" not defined'})
+            raise ValidateException(errors={'message': '"id" not defined'})
 
 
 @dataclass

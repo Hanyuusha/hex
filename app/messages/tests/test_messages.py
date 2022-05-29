@@ -1,8 +1,11 @@
 import uuid
 
+import pytest
+
 from app.messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
     DeleteUserResultMessage, GetUserMessage, GetUserResultMessage,
+    ValidateException,
 )
 from app.store.adapter import ModelUser
 
@@ -19,14 +22,16 @@ def test_create_user_message_to_user():
 
 def test_create_user_message_validate_first_name():
     msg = CreateUserMessage(first_name=None, second_name='Two')
-    exc = msg.validate()
-    assert exc.errors['message'] == '"first_name" not defined'
+    with pytest.raises(ValidateException) as exc:
+        msg.validate()
+    assert exc.value.errors['message'] == '"first_name" not defined'
 
 
 def test_create_user_message_validate_second_name():
     msg = CreateUserMessage(first_name='Zero', second_name=None)
-    exc = msg.validate()
-    assert exc.errors['message'] == '"second_name" not defined'
+    with pytest.raises(ValidateException) as exc:
+        msg.validate()
+    assert exc.value.errors['message'] == '"second_name" not defined'
 
 
 def test_create_user_result_message():
@@ -38,8 +43,9 @@ def test_create_user_result_message():
 
 def test_get_user_message_validate():
     msg = GetUserMessage(id=None)
-    exc = msg.validate()
-    assert exc.errors['message'] == '"id" not defined'
+    with pytest.raises(ValidateException) as exc:
+        msg.validate()
+    assert exc.value.errors['message'] == '"id" not defined'
 
 
 def test_get_user_result_message():
@@ -55,8 +61,9 @@ def test_get_user_result_message():
 
 def test_delete_user_message_validate():
     msg = DeleteUserMessage(id=None)
-    exc = msg.validate()
-    assert exc.errors['message'] == '"id" not defined'
+    with pytest.raises(ValidateException) as exc:
+        msg.validate()
+    assert exc.value.errors['message'] == '"id" not defined'
 
 
 def test_delete_user_message_result():
