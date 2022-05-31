@@ -3,12 +3,13 @@
     EventLoop будет виснуть на вводе пользователя и приложение встанет.
     С другой стороны -
         интерактивный шелл запущен в отдельном процессе от всего остального, поэтому у него свой EventLoop.
-    Пользователь с ним работает монопольно, поэтому помешать ему или он кому то просто не могут.
+    Пользователь с ним работает монопольно, поэтому помешать ему или он кому-то просто не могут.
     В любом случае шелл добавлен только для демонстрации.
 '''
-
+import functools
 import uuid
 from enum import Enum
+from typing import Callable
 
 import cli_ui
 
@@ -25,16 +26,26 @@ class Command(Enum):
     EXIT = 'EXIT'
 
 
-def excetpion_handler(func):
+class ExceptionHandler:
 
-    async def wrapper(*args):
-        try:
-            await func(*args)
-        except (ValueError, ValidateException) as exc:
-            cli_ui.warning(exc)
-            await func(*args)
+    errors: tuple = ()
+    retries: int = 0
 
-    return wrapper
+    def __init__(self, errors: tuple, retries: int):
+        self.errors = errors
+        self.retries = retries + 1
+
+    def __call__(self, fn: Callable) -> Callable:
+        @functools.wraps(fn)
+        async def wrapper(*args, **kwargs):
+            for i in range(1, self.retries):
+                try:
+                    await fn(*args, **kwargs)
+                except self.errors as e:
+                    if i == self.retries:
+                        raise e
+                    cli_ui.warning(e)
+        return wrapper
 
 
 class Cli:
@@ -64,7 +75,7 @@ class Cli:
             case Command.DELETE:
                 await self.delete_user()
 
-    @excetpion_handler
+    @ExceptionHandler((ValidateException, ValueError), 3)
     async def add_user(self):
         first_name = cli_ui.ask_string('Enter first name:', 'Zero')
         second_name = cli_ui.ask_string('Enter second name:', 'Two')
@@ -79,7 +90,7 @@ class Cli:
         cli_ui.info(f'Created user: {result}')
         await self.ask_user()
 
-    @excetpion_handler
+    @ExceptionHandler((ValidateException, ValueError), 3)
     async def show_user(self):
         uid = uuid.UUID(cli_ui.ask_string('Enter User ID to show:'))
         result = await self.bus.handle(
@@ -91,7 +102,7 @@ class Cli:
         cli_ui.info(f'User: {result}')
         await self.ask_user()
 
-    @excetpion_handler
+    @ExceptionHandler((ValidateException, ValueError), 3)
     async def delete_user(self):
         uid = uuid.UUID(cli_ui.ask_string('Enter User ID to delete:'))
         result = await self.bus.handle(
