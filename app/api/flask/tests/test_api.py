@@ -8,7 +8,7 @@ from app.api.flask.api import app
 from app.domain import InternalException
 from app.messages import (
     CreateUserResultMessage, DeleteUserResultMessage, GetUserResultMessage,
-    ValidateException,
+    UpdateUserResultMessage, ValidateException,
 )
 
 
@@ -68,3 +68,12 @@ def test_user_delete_ok(mock_handle, client):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json['exists'] is True
+
+
+@patch('app.bus.bus.MessageBus.handle')
+def test_user_update(mock_handle, client):
+    mock_handle.return_value = UpdateUserResultMessage()
+    response = client.patch(f'/api/v1/user/{uuid.uuid4()}', json={'first_name': 'Rika'})
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json['updated'] is True

@@ -5,7 +5,7 @@ import pytest
 from app.messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
     DeleteUserResultMessage, GetUserMessage, GetUserResultMessage,
-    ValidateException,
+    UpdateUserMessage, ValidateException,
 )
 from app.store.adapter import ModelUser
 
@@ -70,3 +70,20 @@ def test_delete_user_message_result():
     msg = DeleteUserResultMessage(exists=True)
     payload = msg.to_json()
     assert payload['exists'] is True
+
+
+def test_validate_update_message():
+    msg = UpdateUserMessage(first_name=None, second_name=None, id=uuid.uuid4())
+    with pytest.raises(ValidateException) as exc:
+        msg.validate()
+    assert exc.value.errors['message'] == 'No data for update'
+
+    msg = UpdateUserMessage(first_name='Zero', second_name='Two', id=None)
+    with pytest.raises(ValidateException) as exc:
+        msg.validate()
+    assert exc.value.errors['message'] == '"id" not defined'
+
+
+def test_update_message():
+    msg = UpdateUserMessage(first_name='Zero', second_name='Two', id=uuid.uuid4())
+    assert msg.to_json() == {'first_name': 'Zero', 'second_name': 'Two'}

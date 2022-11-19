@@ -7,6 +7,7 @@ from app.bus import MessageBus
 from app.messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
     DeleteUserResultMessage, GetUserMessage, GetUserResultMessage,
+    UpdateUserMessage, UpdateUserResultMessage,
 )
 
 
@@ -59,3 +60,17 @@ async def test_handle_delete_user(mock_delete_user, mock_user_app):
     result = await message_bus.handle(msg)
 
     assert result.exists is True
+
+
+@patch('app.domain.users.UserApp')
+@patch('app.domain.users.UserApp.update_user')
+@pytest.mark.asyncio
+async def test_handle_update_user(mock_update_user, mock_user_app):
+    mock_update_user.return_value = UpdateUserResultMessage()
+    mock_user_app.return_value.update_user = mock_update_user
+
+    message_bus = MessageBus(mock_user_app())
+    msg = UpdateUserMessage(id=uuid.uuid4(), first_name='Rika')
+    result = await message_bus.handle(msg)
+
+    assert isinstance(result, UpdateUserResultMessage)

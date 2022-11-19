@@ -26,3 +26,7 @@ class DataBaseAdapter(metaclass=ABCMeta):
     @abstractmethod
     async def delete_user(self, uid: UUID) -> bool:
         pass
+
+    @abstractmethod
+    async def update_user(self, uid: UUID, payload: dict):
+        pass

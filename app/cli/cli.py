@@ -15,7 +15,8 @@ import cli_ui
 
 from app.bus import IMessageBus
 from app.messages import (
-    CreateUserMessage, DeleteUserMessage, GetUserMessage, ValidateException,
+    CreateUserMessage, DeleteUserMessage, GetUserMessage, UpdateUserMessage,
+    ValidateException,
 )
 
 
@@ -24,6 +25,7 @@ class Command(Enum):
     SHOW = 'SHOW'
     DELETE = 'DELETE'
     EXIT = 'EXIT'
+    UPDATE = 'UPDATE'
 
 
 class ExceptionHandler:
@@ -55,6 +57,7 @@ class Cli:
         Command.SHOW.name,
         Command.DELETE.name,
         Command.EXIT.name,
+        Command.UPDATE.name,
     ]
 
     bus: IMessageBus = None
@@ -74,6 +77,8 @@ class Cli:
                 await self.show_user()
             case Command.DELETE:
                 await self.delete_user()
+            case Command.UPDATE:
+                await self.update_user()
 
     @ExceptionHandler((ValidateException, ValueError), 3)
     async def add_user(self):
@@ -112,4 +117,21 @@ class Cli:
         )
 
         cli_ui.info(f'User: {result}')
+        await self.ask_user()
+
+    @ExceptionHandler((ValidateException, ValueError), 3)
+    async def update_user(self):
+        uid = uuid.UUID(cli_ui.ask_string('Enter User ID:'))
+        first_name = cli_ui.ask_string('Enter new first name:')
+        second_name = cli_ui.ask_string('Enter new second name:')
+
+        await self.bus.handle(
+            UpdateUserMessage(
+                first_name=first_name,
+                second_name=second_name,
+                id=uid,
+            )
+        )
+
+        cli_ui.info('User updated')
         await self.ask_user()

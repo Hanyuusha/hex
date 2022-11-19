@@ -95,3 +95,26 @@ class DeleteUserResultMessage(BaseResponse):
         if self.exists:
             return 'deleted'
         return 'not found'
+
+
+@dataclass
+class UpdateUserMessage(BaseRequest):
+    id: UUID
+    first_name: str | None = None
+    second_name: str | None = None
+
+    def validate(self):
+        if self.id is None:
+            raise ValidateException(errors={'message': '"id" not defined'})
+        if self.first_name is None and self.second_name is None:
+            raise ValidateException(errors={'message': 'No data for update'})
+
+    def to_json(self):
+        return {'first_name': self.first_name, 'second_name': self.second_name}
+
+
+@dataclass
+class UpdateUserResultMessage(BaseResponse):
+
+    def to_json(self) -> dict:
+        return {'updated': True}

@@ -6,6 +6,7 @@ from fastapi import status
 from app.messages import (
     CreateUserMessage, CreateUserResultMessage, DeleteUserMessage,
     DeleteUserResultMessage, GetUserMessage, GetUserResultMessage,
+    UpdateUserMessage, UpdateUserResultMessage,
 )
 from app.store.adapter import DataBaseAdapter
 
@@ -28,6 +29,10 @@ class IUsersApp(metaclass=ABCMeta):
 
     @abstractmethod
     async def get_user(self, msg: GetUserMessage) -> GetUserResultMessage:
+        pass
+
+    @abstractmethod
+    async def update_user(self, msg: UpdateUserMessage) -> UpdateUserResultMessage:
         pass
 
 
@@ -53,3 +58,7 @@ class UserApp(IUsersApp):
             raise InternalException({'message': 'user not found'}, status=status.HTTP_404_NOT_FOUND)
 
         return GetUserResultMessage(id=user.id, first_name=user.first_name, second_name=user.second_name)
+
+    async def update_user(self, msg: UpdateUserMessage) -> UpdateUserResultMessage:
+        await self.adapter.update_user(msg.id, msg.to_json())
+        return UpdateUserResultMessage()

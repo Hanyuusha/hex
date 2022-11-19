@@ -1,4 +1,3 @@
-import json
 import uuid
 from uuid import UUID
 
@@ -14,16 +13,15 @@ class RedisAdapter(DataBaseAdapter):
     redis = None
 
     def __init__(self):
-        pool = aioredis.ConnectionPool.from_url(url=get_redis_url(), max_connections=10)
+        pool = aioredis.ConnectionPool.from_url(url=get_redis_url(), max_connections=10, decode_responses=True)
         self.redis = aioredis.Redis(connection_pool=pool)
 
     async def get_user(self, uid: UUID) -> ModelUser | None:
-        payload = await self.redis.get(str(uid))
+        payload: dict = await self.redis.hgetall(str(uid))
 
-        if payload is None:
+        if payload is None or len(payload.keys()) == 0:
             return None
 
-        payload = json.loads(payload)
         return ModelUser(
             id=UUID(payload.get('id')),
             first_name=payload.get('first_name'),
@@ -34,7 +32,7 @@ class RedisAdapter(DataBaseAdapter):
         uid = uuid.uuid4()
         user.id = uid
 
-        await self.redis.set(str(uid), json.dumps(user.to_json()))
+        await self.redis.hset(str(uid), mapping=user.to_json())
         return uid
 
     async def delete_user(self, uid: UUID) -> bool:
@@ -43,3 +41,6 @@ class RedisAdapter(DataBaseAdapter):
 
         await self.redis.delete(str(uid))
         return True
+
+    async def update_user(self, uid: UUID, payload: dict):
+        await self.redis.hset(str(uid), mapping=payload)

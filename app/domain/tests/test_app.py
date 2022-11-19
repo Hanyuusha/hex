@@ -4,7 +4,10 @@ from unittest.mock import patch
 import pytest
 
 from app.domain.users import InternalException, UserApp
-from app.messages import CreateUserMessage, DeleteUserMessage, GetUserMessage
+from app.messages import (
+    CreateUserMessage, DeleteUserMessage, GetUserMessage, UpdateUserMessage,
+    UpdateUserResultMessage,
+)
 from app.store.adapter import ModelUser
 
 
@@ -70,3 +73,17 @@ async def test_handle_delete_user(mock_delete_user, mock_database_adapter):
     result = await user_app.delete_user(msg)
 
     assert result.exists is True
+
+
+@pytest.mark.asyncio
+@patch('app.store.adapter.DataBaseAdapter')
+@patch('app.store.adapter.DataBaseAdapter.update_user')
+async def test_handle_update_user(mock_update_user, mock_database_adapter):
+    msg = UpdateUserMessage(id=uuid.uuid4(), first_name='Rika')
+
+    mock_database_adapter.return_value.update_user = mock_update_user
+
+    user_app = UserApp(adapter=mock_database_adapter())
+    result = await user_app.update_user(msg)
+
+    assert isinstance(result, UpdateUserResultMessage)

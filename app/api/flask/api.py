@@ -6,7 +6,8 @@ from flask.views import MethodView
 from app.bus import IMessageBus, get_message_bus
 from app.domain import InternalException
 from app.messages import (
-    CreateUserMessage, DeleteUserMessage, GetUserMessage, ValidateException,
+    CreateUserMessage, DeleteUserMessage, GetUserMessage, UpdateUserMessage,
+    ValidateException,
 )
 
 app = Flask(__name__)
@@ -29,7 +30,7 @@ class UserAPI(MethodView):
         return result.to_json()
 
     async def post(self):
-        payload = request.json
+        payload: dict = request.json
 
         result = await self.message_bus.handle(
             CreateUserMessage(
@@ -49,6 +50,19 @@ class UserAPI(MethodView):
 
         return result.to_json()
 
+    async def patch(self, uid):
+        payload: dict = request.json
+
+        result = await self.message_bus.handle(
+            UpdateUserMessage(
+                id=uid,
+                first_name=payload.get('first_name'),
+                second_name=payload.get('second_name'),
+            )
+        )
+
+        return result.to_json()
+
 
 @app.errorhandler(InternalException)
 def internal_exception_handler(exc: InternalException):
@@ -63,5 +77,6 @@ def validate_exception_handler(exc: ValidateException):
 user_view = UserAPI.as_view('user_api')
 app.add_url_rule('/api/v1/user/<uuid:uid>', view_func=user_view, methods=['GET', 'DELETE'])
 app.add_url_rule('/api/v1/user', view_func=user_view, methods=['POST'])
+app.add_url_rule('/api/v1/user/<uuid:uid>', view_func=user_view, methods=['PATCH'])
 
 asgi_app = WsgiToAsgi(app)

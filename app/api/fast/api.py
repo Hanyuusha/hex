@@ -7,7 +7,8 @@ from pydantic import BaseModel
 from app.bus import IMessageBus, get_message_bus
 from app.domain import InternalException
 from app.messages import (
-    CreateUserMessage, DeleteUserMessage, GetUserMessage, ValidateException,
+    CreateUserMessage, DeleteUserMessage, GetUserMessage, UpdateUserMessage,
+    ValidateException,
 )
 
 app = FastAPI()
@@ -37,13 +38,13 @@ async def validation_exception_handler(_: Request, exc: ValidateException):
     )
 
 
-class CreateUser(BaseModel):
+class CreateUpdateUser(BaseModel):
     first_name: str
     second_name: str
 
 
 @rout.post('/user')
-async def create_user(user: CreateUser, bus: IMessageBus = Depends(get_bus)):
+async def create_user(user: CreateUpdateUser, bus: IMessageBus = Depends(get_bus)):
     result = await bus.handle(
         CreateUserMessage(
             first_name=user.first_name,
@@ -72,5 +73,16 @@ async def del_user(uid: uuid.UUID, bus: IMessageBus = Depends(get_bus)):
     )
     return result.to_json()
 
+
+@rout.patch('/user/{uid}')
+async def update_user(uid: uuid.UUID, new_user_data: CreateUpdateUser, bus: IMessageBus = Depends(get_bus)):
+    result = await bus.handle(
+        UpdateUserMessage(
+            id=uid,
+            first_name=new_user_data.first_name,
+            second_name=new_user_data.second_name,
+        )
+    )
+    return result.to_json()
 
 app.include_router(rout)

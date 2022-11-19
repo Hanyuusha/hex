@@ -60,3 +60,13 @@ async def test_delete_exists_user(adapter, uid):
 async def test_delete_non_exists_user(adapter):
     exists = await adapter.delete_user(uuid.uuid4())
     assert exists is False
+
+
+@pytest.mark.asyncio
+async def test_update_user(adapter, uid):
+    uid = await uid
+    payload = {'second_name': 'Furude'}
+    await adapter.update_user(uid, payload)
+    user = await adapter.get_user(uid)
+    assert user.first_name == 'Zero'
+    assert user.second_name == 'Furude'

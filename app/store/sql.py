@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, update
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -67,3 +67,14 @@ class SQLAlchemyAdapter(DataBaseAdapter):
             await session.delete(user)
             await session.commit()
             return True
+
+    async def update_user(self, uid: UUID, payload: dict):
+        async with self.Session() as session:
+
+            query = update(User)\
+                .where(User.id == uid)\
+                .values(payload)\
+                .execution_options(synchronize_session='fetch')
+
+            await session.execute(query)
+            await session.commit()
