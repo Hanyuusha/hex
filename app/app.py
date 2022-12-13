@@ -40,7 +40,7 @@ def wait_for_postgres():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
-            s.connect((DB_PORT, DB_HOST))
+            s.connect((DB_HOST, DB_PORT))
             s.close()
             break
         except socket.error:

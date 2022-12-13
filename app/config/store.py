@@ -1,15 +1,15 @@
 import os
 
-DB_HOST = int(os.getenv('DB_PORT', '5557'))
-DB_PORT = os.getenv('DB_HOST', 'localhost')
+DB_HOST = os.getenv('DB_HOST', 'localhost')
 
+DB_PORT = int(os.getenv('DB_PORT', '5557'))
 
 def get_sync_db_url():
     return 'postgresql://%s:%s@%s:%s/%s' % (
         os.getenv('DB_USER', ''),
         os.getenv('DB_PASSWORD', ''),
-        DB_PORT,
         DB_HOST,
+        DB_PORT,
         os.getenv('DB_NAME', 'db'),
     )
 
@@ -18,8 +18,8 @@ def get_async_db_url():
     return 'postgresql+asyncpg://%s:%s@%s:%s/%s' % (
         os.getenv('DB_USER', ''),
         os.getenv('DB_PASSWORD', ''),
-        DB_PORT,
         DB_HOST,
+        DB_PORT,
         os.getenv('DB_NAME', 'db'),
     )
 
