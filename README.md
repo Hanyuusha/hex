@@ -2,7 +2,7 @@
 
 
 #### HEX
-Попытка накидать [Hexagonal architecture](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software))
+[Hexagonal architecture](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)) example.
 
 ### Requirements
 1. Python >= 3.10
